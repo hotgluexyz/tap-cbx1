@@ -1,0 +1,6 @@
+.vscode
+.venv
+.secrets
+
+.DS_Store
+__pycache__
