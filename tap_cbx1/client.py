@@ -1,16 +1,10 @@
 """REST client handling, including LightspeedStream base class."""
 
-from typing import Any, Dict, Iterable, Optional, TypeVar
-from pytz import timezone
-import urllib3
+from typing import Any, Iterable, Optional, TypeVar
 import requests
 from pendulum import parse
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.streams import RESTStream
-from singer_sdk.exceptions import RetriableAPIError, FatalAPIError
-
-from time import sleep
-from http.client import ImproperConnectionState, RemoteDisconnected
 import singer
 from singer import StateMessage
 _TToken = TypeVar("_TToken")
