@@ -35,6 +35,9 @@ class AccountStream(CBX1Stream):
     name = "accounts"
     path = "/targets/accounts"
     primary_keys = ["id"]
+    
+    replication_key = "updatedAt"
+
     schema = th.PropertiesList(
         th.Property("id", th.StringType),
         th.Property("createdAt", th.DateTimeType),
@@ -81,6 +84,9 @@ class ContactStream(CBX1Stream):
     name = "contacts"
     path = "/targets/contacts"
     primary_keys = ["id"]
+
+    replication_key = "updatedAt"
+
     schema = th.PropertiesList(
         th.Property("id", th.StringType),
         th.Property("createdAt", th.DateTimeType),
