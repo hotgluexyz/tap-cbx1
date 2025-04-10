@@ -36,6 +36,20 @@ class TapCBX1Auth(OAuthAuthenticator, metaclass=SingletonMeta):
             stream=stream,
             auth_endpoint="https://qa-api.cbx1.app/api/g/v1/auth/token/generate",
         )
+        
+    def is_token_valid(self) -> bool:
+        """Check if token is valid.
+
+        Returns:
+            True if the token is valid (fresh).
+        """
+        if self.last_refreshed is None:
+            return False
+        if not self.expires_in:
+            return True
+        if self.expires_in > (utc_now() - self.last_refreshed).total_seconds():
+            return True
+        return False
 
     # Authentication and refresh
     def update_access_token(self) -> None:
@@ -60,17 +74,12 @@ class TapCBX1Auth(OAuthAuthenticator, metaclass=SingletonMeta):
             )
         token_json = token_response.json().get("data")
         self.access_token = token_json["sessionToken"]
-        self.expires_in = token_json.get("maxAge", 10)
-        if self.expires_in is None:
-            self.logger.debug(
-                "No expires_in receied in OAuth response and no "
-                "default_expiration set. Token will be treated as if it never "
-                "expires."
-            )
+        self.expires_in = token_json.get("maxAge", 2592000)  # Default to 30 days
         self.last_refreshed = request_time
 
         # store access_token in config file
-        self._tap._config["access_token"] = token_json["sessionToken"]
+        self._tap._config["access_token"] = self.access_token
+        self._tap._config["expires_in"] = self.expires_in
         # self._tap._config["refresh_token"] = token_json["refresh_token"]
 
         with open(self._tap.config_file, "w") as outfile:
